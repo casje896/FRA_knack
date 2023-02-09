@@ -1,0 +1,8 @@
+För att fira 42.5års-jubileumet av PacMan har vårt utvecklingsteam byggt en PacMan-klon. Tyvärr råkade delar av koden raderas, så vi behöver din hjälp att lösa problemet!
+
+Hjälp oss att förstå vårt nya binära filformat för sparfiler (savefile_orig_v2.bin). Till din hjälp får du en sparfil av en körning av spelet samt spelet själv. Ta ett screenshot på så många kartor du kan.
+
+Tips:
+* Utgå från hur koden för paketeringen fungerar för att förstå hur filformatet är uppbyggt.
+* Det går att spela spelet, och på så sätt generera nya sparfiler. Detta kan vara användbart.
+* Notera att även en del-lösning kan vara värd att skicka in!

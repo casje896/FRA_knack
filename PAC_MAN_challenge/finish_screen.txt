@@ -1,0 +1,45 @@
+'+'   				# marker_object
+curses.COLOR_RED	# fg_objects
+curses.COLOR_YELLOW   # bg_objects
+curses.A_BOLD		# att_objects
+'+'					# marker_object
+curses.COLOR_BLACK	# fg_ground
+curses.COLOR_YELLOW	# bg_ground
+curses.A_NORMAL		# att_ground
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+x  xx                   x                   xx  x
+x    xx  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  xx    x
+x  *   xx               x               xx   *  x
+x  *  x  xx * * * * * * x * * * * * * xx  x  *  x
+x  *  x    xx           x           xx    x  *  x
+x  *  x   *  xxxxxxxxxxxxxxxxxxxxxxx  *   x  *  x
+x  *  x  *   x                     x   *  x  *  x
+x  *  x   *  x     *CONGRATZ!*     x  *   x  *  x
+x  *  x  *   x                     x   *  x  *  x
+x  *  x   *  x    ALL LEVELS ARE   x  *   x  *  x
+x  *  x  *   x                     x   *  x  *  x
+x  *  x   *  x    COMPLETED AND    x  *   x  *  x
+x  *  x  *   x                     x   *  x  *  x
+xxxxxxxxxxxxxx   THE FINAL SCORE   xxxxxxxxxxxxxx
+x  *  x      x                     x      x  *  x
+x  *  x      x   IS GIVEN TO THE   x      x  *  x
+x  *  x      x                     x      x  *  x
+x  *  x      x  RIGHT.  PRESS ESC  x      x  *  x
+x  *  x      x                     x      x  *  x
+x  *  x      x       TO EXIT       x      x  *  x
+x  *  x      x                     x      x  *  x
+x  *  x      x                     x      x  *  x
+x  *  x      xxxxxxxxxxxxxxxxxxxxxxx      x  *  x
+x  *  x     x           x           x     x  *  x
+x  *  x    x            x            x    x  *  x
+x  *  x   x.v.v.v.v.v.v.x.v.v.v.v.v.v.x   x  *  x
+x  *  x  x              x              x  x  *  x
+x  *  x x.v.v.v.v.v.v.v.x.v.v.v.v.v.v.v.x x  *  x
+x  *   x                x                x   *  x
+x  *  x xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx x  *  x
+x  * x                  x                  x *  x
+x   x                   x                   x*  x
+x  x  * * * * * * * * * x * * * * * * * * *  x  x
+x x                     x                     x x
+xx                      x                      xx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

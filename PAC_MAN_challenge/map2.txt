@@ -1,0 +1,45 @@
+'v'   				# marker_object
+0 					# fg_objects
+curses.COLOR_GREEN  # bg_objects
+curses.A_BOLD		# att_objects
+'.'					# marker_object
+curses.COLOR_GREEN	# fg_ground
+0					# bg_ground
+curses.A_NORMAL		# att_ground
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+x                                               x
+x      x    x        x    x        x    x       x
+x    x xx  xx x    x xx  xx x    x xx  xx x     x
+x    x xx  xx x    x xx  xx x    x xx  xx x     x
+x     x x  x x      x x  x x      x x  x x      x
+x      xxxxxx        xxxxxx        xxxxxx       x
+x        xx            xx            xx         x
+x                                               x
+x      x    x        x    x        x    x       x
+x    x xx  xx x    x xx  xx x    x xx  xx x     x
+x    x xx  xx x    x xx  xx x    x xx  xx x     x
+x     x x  x x      x x  x x      x x  x x      x
+x      xxxxxx        xxxxxx        xxxxxx       x
+x        xx            xx            xx         x
+x                                               x
+x      x    x        x    x        x    x       x
+x    x xx  xx x    x xx  xx x    x xx  xx x     x
+x    x xx  xx x    x xx  xx x    x xx  xx x     x
+x     x x  x x      x x  x x      x x  x x      x
+x      xxxxxx        xxxxxx        xxxxxx       x
+x        xx            xx            xx         x
+x                                               x
+x      x    x        x    x        x    x       x
+x    x xx  xx x    x xx  xx x    x xx  xx x     x
+x    x xx  xx x    x xx  xx x    x xx  xx x     x
+x     x x  x x      x x  x x      x x  x x      x
+x      xxxxxx        xxxxxx        xxxxxx       x
+x        xx            xx            xx         x
+x                                               x
+x      x    x        x    x        x    x       x
+x    x xx  xx x    x xx  xx x    x xx  xx x     x
+x    x xx  xx x    x xx  xx x    x xx  xx x     x
+x     x x  x x      x x  x x      x x  x x      x
+x      xxxxxx        xxxxxx        xxxxxx       x
+x        xx            xx            xx         x
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
