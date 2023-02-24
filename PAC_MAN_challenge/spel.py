@@ -184,6 +184,12 @@ class ScoreBoard(object):
 
 
 def bin_packer(keys, date, level, y, x, s, color_id, attr):
+    
+    f = open('level.txt', 'a')
+    f.write(str(level))
+    f.write("\n")
+    f.close
+    
     payload = b""
 
     # Append timestamp
@@ -260,12 +266,12 @@ def bin_packer(keys, date, level, y, x, s, color_id, attr):
 
     # Packet structure: length + crc + level + payload
     return out_bin
-########################################################################################################
+
 def bin_unpacker(file_name):
     cs = struct.calcsize
     with open(file_name, 'rb') as f:
         data = f.read()
-
+    #level 1: 2400, level 2: 2401-6322, level 3: 6323-8317
     keys = load_keys()
 
     packets = []
@@ -279,15 +285,122 @@ def bin_unpacker(file_name):
         packets.append(d)
         pos += ll
 
-        
+    f = open('plain.txt', 'w')
+    f.write("TEST" + "\n")
+    
+    #line = gzip.decompress(data)
+    #f.write(line)
     unpacked_data = []
+    count = 0
     for p in packets:
         pos = 0
-        
+        #line = []
         # TODO: Unpack every packets and extract the data needed below
+        """
+        while pos < len(p):
+            ll = struct.unpack('>h', p[pos:pos+cs('>h')])[0]
+            pos += cs('>h')
+            d = p[pos:pos+ll]
+            line.append(d)
+            pos += ll
+        #line = codecs.decode(p.hex(), 'rot_13')
+        #line = gzip.decompress(data)
+        final = []
+        for i in line:
+            if (count <= (len(packets)/4 + 200)):
+                final.append(str(i))
+            elif (count < (3*len(packets)/4)):
+                #final.append(gzip.decompress(i))
+                #line = "----- NOTHING -----"
+                final.append("-")
+            else:
+                #line = codecs.decode(p.hex(), 'rot_13')
+                final.append(codecs.getdecoder(line.hex(), 'rot_13').decode())
+            
+        f.write("".join(final))
+        f.write("\n")
+        count = count+1
+        ts = ""
+        level = ""
+        y = ""
+        x = ""
+        marker = ""
+        color = ""
+        attr = ""
+        """
+        f.write(str(p) + "\n")
+        crc_bin = p[pos+cs('ccc'):pos+cs('>I')]
+        pos += cs('ccc')
+        pos += cs('>I')
 
-        unpacked_data.append([ts, level, y, x, marker, color, attr])
+        f.write(str(crc_bin) + "\n")
+        f.write(str(pos) + "\n")
+        level_bin = int.from_bytes(p[pos+cs('ccc'):pos+cs('>I')], "big")
+        f.write(str(level_bin))
+        pos += cs('>ccc')
+        #pos += cs('>I')
+        f.write(str(pos) + "\n")
+        pos += cs('ccc')
+        payload = p[pos:]
         
+        # Checksum verification
+        #crc = zlib.crc32(payload)
+        #if crc_bin != struct.pack('>I', crc):
+        #    raise ValueError('Checksum does not match!')
+
+        # Decrypt payload if necessary
+        if level_bin == 1:
+            pass
+        elif level_bin == 2:
+            payload = gzip.decompress(payload)
+        elif level_bin == 3:
+            payload = codecs.decode(payload.decode(), 'rot_13')
+            payload = bytes.fromhex(payload)
+        elif level_bin == 4:
+            k = keys['rc4']
+            rc4 = ARC4.new(k)
+            payload = rc4.decrypt(payload)
+        elif level_bin == 5:
+            k = keys['very_strong']
+            rc4 = ARC4.new(k)
+            payload = rc4.decrypt(payload)
+        else:
+            raise ValueError(f'Unknown level {level_bin}')
+
+        # Extract timestamp
+        ts_bytes = payload[pos+cs('ccc'):pos+cs('ccc')+3]
+        pos += 3
+        #ts = datetime.datetime.fromtimestamp(struct.unpack('>d', ts_bytes)[0])
+        ts = datetime.datetime.fromtimestamp(float(ts_bytes.decode()))
+
+        # Extract coordinate
+        y, x = struct.unpack('>hh', payload[pos:pos+4])
+        pos += 4
+
+        # Extract marker
+        s = payload[pos:pos+1].decode()
+        pos += 1
+
+        # Extract color
+        if payload[pos] == 0:
+            color = None
+            pos += 1
+        else:
+            color_id = struct.unpack('>i', payload[pos+1:pos+5])[0]
+            color = color_id
+            pos += 5
+
+        # Extract attribute
+        if payload[pos] == 0:
+            attr = None
+            pos += 1
+        else:
+            attr = struct.unpack('>i', payload[pos+1:pos+5])[0]
+            pos += 5
+        f.write(str([ts, level, y, x, marker, color, attr]))
+        unpacked_data.append([ts, level, y, x, marker, color, attr])
+
+    #f.close    
     return unpacked_data
 
 
