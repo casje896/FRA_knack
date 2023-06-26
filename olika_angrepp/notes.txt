@@ -1,0 +1,25 @@
+
+172.22.0.1: verkar vara nån typ av angripare 
+172.22.0.2: verkar vara en server eller sida som angriparen försöker logga in på. 
+
+Flera loginattempt försöker göras, med olika lösenordskombinationer, vad det ser ut som är de lösenrd som testas de första x-stycken från rockyou-listan (de vanligaste lösenorden i världen graderat efter förekomst med vanligast högst upp). 
+Om man tittar på tidstämplarna mellan försöken så ser måste angreppet vara automatiskt eftersom det går otroligt snabbt. 
+Vid ungefär rad 1000 börjar den ändra användarnamnet också. 
+Angreppet sker den 22a maj, runt kl 13:04
+
+Längre svar från servern fås vid 3519, behöver inte vara något då försöken forsätter efter
+
+6994 verkar det som att angriparen hittade rätt lösenord eftersom försöken slutar här och den börjar göra andra saker. 
+7004 verkar angriparen hämta hemsidan, dvs den har kommit vidare och loggat in. 
+Kl är nu 13:09. 
+7006: angriparen verkar post:a nåt [malformed packet]
+7008: Servern svarar med en 302-found på post requesten, detta borde den inte göra tror jag, potentiell svaghet. Denna gör typ att en resurs som man bett om flyttas till URL:en, skumt. 
+
+7020: attakceraren verkar försöka hämta något via url:en, den verkar försöka med olika cmd variabler. 
+Kanske att den hämtar olika sidor. 
+
+7111: Attackeraren verkar fokusera på en annan del av hemsidan. 
+7117: attackerade öppnar en SSL-tunnel (???) med servern och skickar data. 
+Den verkar skicka med SSL både från servern och till angriparen fram och tillbaka nu. 
+7212: Angriparen  verkar börja tanka ner något stort. 
+9701: angriparen verkar fortsätta med något annat. 

